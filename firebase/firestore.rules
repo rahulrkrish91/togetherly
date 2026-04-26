@@ -1,0 +1,45 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function familyMemberDocId(familyId) {
+      return request.auth.uid + '_' + familyId;
+    }
+
+    function isFamilyMember(familyId) {
+      return exists(/databases/$(database)/documents/familyMembers/$(familyMemberDocId(familyId)));
+    }
+
+    match /families/{familyId} {
+      allow read: if isSignedIn() && isFamilyMember(familyId);
+      allow create: if isSignedIn();
+      allow update, delete: if isSignedIn() && isFamilyMember(familyId);
+    }
+
+    match /familyMetadata/{familyId} {
+      allow read: if isSignedIn() && isFamilyMember(familyId);
+      allow write: if false;
+    }
+
+    match /messages/{messageId} {
+      allow read: if isSignedIn() && isFamilyMember(resource.data.familyId);
+      allow create: if isSignedIn() && isFamilyMember(request.resource.data.familyId);
+      allow update, delete: if false;
+    }
+
+    match /events/{eventId} {
+      allow read: if isSignedIn() && isFamilyMember(resource.data.familyId);
+      allow create, update: if isSignedIn() && isFamilyMember(request.resource.data.familyId);
+      allow delete: if false;
+    }
+
+    match /locations/{locationId} {
+      allow read: if isSignedIn() && isFamilyMember(resource.data.familyId);
+      allow create, update: if isSignedIn() && isFamilyMember(request.resource.data.familyId);
+      allow delete: if false;
+    }
+  }
+}
