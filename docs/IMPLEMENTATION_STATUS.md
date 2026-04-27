@@ -85,9 +85,10 @@
 - 🚧 Install dependencies and execute full CI in a permitted networked environment.
 
 ### Phase 2 backlog
-- Push notifications (FCM) for chat/events.
-- Offline-first sync strategy and conflict resolution.
-- Voice/video calling (WebRTC).
+- ✅ Push notifications scaffold added (token registration + notification tap listener).
+- ✅ Offline-first sync scaffold added (mutation queue + replay engine + conflict resolver baseline).
+- ✅ Voice/video calling scaffold added (WebRTC session service + call screen entry point).
+- 🚧 Replace scaffolds with production signaling, background delivery, and QoS controls.
 
 ## Suggested execution order (next 3 sprints)
 

@@ -24,6 +24,7 @@ import {
 } from '../../../services/chat/chatService';
 import { useAuth } from '../../../features/auth/AuthProvider';
 import { trackError, trackEvent } from '../../../services/telemetry/telemetry';
+import { enqueueMutation } from '../../../services/offline/offlineQueue';
 
 type UploadDraft = {
   id: string;
@@ -33,7 +34,7 @@ type UploadDraft = {
   failed: boolean;
 };
 
-export default function ChatRoomScreen({ route }: { route: { params: { familyId: string } } }) {
+export default function ChatRoomScreen({ route, navigation }: { route: { params: { familyId: string } }; navigation: { navigate: (screen: string, params?: unknown) => void } }) {
   const { familyId } = route.params;
   const { authUser } = useAuth();
 
@@ -74,7 +75,15 @@ export default function ChatRoomScreen({ route }: { route: { params: { familyId:
       setInput('');
       trackEvent('chat_text_sent', { familyId });
     } catch (error) {
-      trackError('chat_pagination_load_failed', error, { familyId });
+      trackError('chat_text_send_failed', error, { familyId });
+      if (authUser) {
+        await enqueueMutation({
+          id: `offline_chat_${Date.now()}`,
+          kind: 'chat_send',
+          payload: { familyId, senderId: authUser.uid, text: input.trim() },
+          createdAt: Date.now(),
+        });
+      }
     } finally {
       setSending(false);
     }
@@ -181,6 +190,13 @@ export default function ChatRoomScreen({ route }: { route: { params: { familyId:
         className="flex-1"
       >
         <Text className="mt-3 text-lg font-semibold text-slate-900">Family Chat Room</Text>
+
+        <Pressable
+          className="mt-2 self-start rounded-xl border border-brand px-3 py-2"
+          onPress={() => navigation.navigate('Call', { familyId })}
+        >
+          <Text className="font-medium text-brand">Start Voice/Video Call</Text>
+        </Pressable>
 
         {loading ? (
           <View className="mt-4">

@@ -20,6 +20,7 @@ React Native (Expo) + TypeScript starter for a multi-family collaboration app wi
 - Profile + permissions scaffold: profile edit (name/avatar), member management UI, admin-restricted actions
 - Security hardening scaffold: stricter Firestore field validation, Storage rules, validator parity helpers
 - Quality/ops scaffold: Vitest tests, CI workflow, telemetry event/error tracking
+- Phase-2 scaffold: push notifications, offline queue/conflict resolution, WebRTC call session baseline
 - Initial screen stubs for feature verticals
 - Initial Firestore rules draft with membership helper checks
 - Firestore cost-control helpers for cache-first reads, pagination, delta sync, and no-op write prevention
@@ -104,4 +105,4 @@ firebase-blueprint.json
 3. Harden chat room media pipeline (thumbnail previews, video playback, delivery receipts).
 4. Add advanced event editing (time ranges, reminders, attendee mentions).
 5. Add background location mode + battery-aware throttling policies.
-6. Add Firebase Emulator integration tests and production telemetry exporter (Sentry/OTel).
+6. Replace call scaffold with end-to-end WebRTC signaling + TURN + in-call media controls.
