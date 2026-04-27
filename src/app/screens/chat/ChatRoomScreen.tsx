@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import * as ImageManipulator from 'expo-image-manipulator';
+import { Camera, Paperclip, Phone, Video } from 'lucide-react-native';
 import Screen from '../../../components/common/Screen';
 import MessageBubble from '../../../components/chat/MessageBubble';
 import MessageSkeleton from '../../../components/chat/MessageSkeleton';
@@ -34,8 +35,14 @@ type UploadDraft = {
   failed: boolean;
 };
 
-export default function ChatRoomScreen({ route, navigation }: { route: { params: { familyId: string } }; navigation: { navigate: (screen: string, params?: unknown) => void } }) {
-  const { familyId } = route.params;
+export default function ChatRoomScreen({
+  route,
+  navigation,
+}: {
+  route: { params: { familyId: string; title?: string; lastSeen?: string } };
+  navigation: { navigate: (screen: string, params?: unknown) => void };
+}) {
+  const { familyId, title = 'Family Chat', lastSeen = 'Online now' } = route.params;
   const { authUser } = useAuth();
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -76,14 +83,12 @@ export default function ChatRoomScreen({ route, navigation }: { route: { params:
       trackEvent('chat_text_sent', { familyId });
     } catch (error) {
       trackError('chat_text_send_failed', error, { familyId });
-      if (authUser) {
-        await enqueueMutation({
-          id: `offline_chat_${Date.now()}`,
-          kind: 'chat_send',
-          payload: { familyId, senderId: authUser.uid, text: input.trim() },
-          createdAt: Date.now(),
-        });
-      }
+      await enqueueMutation({
+        id: `offline_chat_${Date.now()}`,
+        kind: 'chat_send',
+        payload: { familyId, senderId: authUser.uid, text: input.trim() },
+        createdAt: Date.now(),
+      });
     } finally {
       setSending(false);
     }
@@ -142,7 +147,10 @@ export default function ChatRoomScreen({ route, navigation }: { route: { params:
           trackEvent('chat_media_sent', { familyId, type });
         } catch {
           upsertDraft(draftId, { failed: true });
-          trackError('chat_media_send_failed', new Error('Failed to create media message'), { familyId, type });
+          trackError('chat_media_send_failed', new Error('Failed to create media message'), {
+            familyId,
+            type,
+          });
         }
       }
     );
@@ -189,14 +197,22 @@ export default function ChatRoomScreen({ route, navigation }: { route: { params:
         keyboardVerticalOffset={90}
         className="flex-1"
       >
-        <Text className="mt-3 text-lg font-semibold text-slate-900">Family Chat Room</Text>
-
-        <Pressable
-          className="mt-2 self-start rounded-xl border border-brand px-3 py-2"
-          onPress={() => navigation.navigate('Call', { familyId })}
-        >
-          <Text className="font-medium text-brand">Start Voice/Video Call</Text>
-        </Pressable>
+        <View className="mt-3 rounded-3xl border border-white/60 bg-white/70 px-4 py-3 shadow-sm">
+          <View className="flex-row items-center justify-between">
+            <View>
+              <Text className="text-lg font-bold text-slate-900">{title}</Text>
+              <Text className="mt-0.5 text-xs text-slate-500">{lastSeen}</Text>
+            </View>
+            <View className="flex-row gap-2">
+              <Pressable className="rounded-full bg-white p-2" onPress={() => navigation.navigate('Call', { familyId })}>
+                <Phone size={16} color="#334155" />
+              </Pressable>
+              <Pressable className="rounded-full bg-white p-2" onPress={() => navigation.navigate('Call', { familyId })}>
+                <Video size={16} color="#334155" />
+              </Pressable>
+            </View>
+          </View>
+        </View>
 
         {loading ? (
           <View className="mt-4">
@@ -209,7 +225,12 @@ export default function ChatRoomScreen({ route, navigation }: { route: { params:
             data={listData}
             keyExtractor={(item) => item.id}
             className="mt-3 flex-1"
+            contentContainerStyle={{ paddingBottom: 8 }}
             inverted
+            initialNumToRender={18}
+            maxToRenderPerBatch={12}
+            windowSize={11}
+            removeClippedSubviews
             onEndReachedThreshold={0.2}
             onEndReached={loadMore}
             ListFooterComponent={loadingMore ? <ActivityIndicator /> : null}
@@ -236,23 +257,28 @@ export default function ChatRoomScreen({ route, navigation }: { route: { params:
           />
         )}
 
-        <View className="mb-2 mt-2 flex-row items-center gap-2">
-          <Pressable className="rounded-xl border border-brand px-3 py-3" onPress={pickMedia}>
-            <Text className="font-medium text-brand">+ Media</Text>
-          </Pressable>
-          <TextInput
-            className="flex-1 rounded-xl border border-slate-300 bg-white px-3 py-3"
-            placeholder="Write a message"
-            value={input}
-            onChangeText={setInput}
-          />
-          <Pressable
-            className="rounded-xl bg-brand px-4 py-3"
-            onPress={handleSend}
-            disabled={sending || !input.trim()}
-          >
-            {sending ? <ActivityIndicator color="#fff" /> : <Text className="font-semibold text-white">Send</Text>}
-          </Pressable>
+        <View className="mb-2 mt-2 rounded-full border border-white/70 bg-white/70 px-3 py-2 shadow-sm">
+          <View className="flex-row items-center gap-2">
+            <Pressable className="h-9 w-9 items-center justify-center rounded-full bg-slate-100" onPress={pickMedia}>
+              <Paperclip size={16} color="#334155" />
+            </Pressable>
+            <TextInput
+              className="flex-1 rounded-full bg-white px-4 py-2"
+              placeholder="Write a message"
+              value={input}
+              onChangeText={setInput}
+            />
+            <Pressable className="h-9 w-9 items-center justify-center rounded-full bg-slate-100" onPress={pickMedia}>
+              <Camera size={16} color="#334155" />
+            </Pressable>
+            <Pressable
+              className="h-10 w-10 items-center justify-center rounded-full bg-brand"
+              onPress={handleSend}
+              disabled={sending || !input.trim()}
+            >
+              {sending ? <ActivityIndicator color="#fff" /> : <Text className="font-bold text-white">➤</Text>}
+            </Pressable>
+          </View>
         </View>
       </KeyboardAvoidingView>
     </Screen>

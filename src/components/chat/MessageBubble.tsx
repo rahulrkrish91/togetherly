@@ -12,8 +12,10 @@ export default function MessageBubble({
   return (
     <Animated.View entering={FadeInDown.duration(180)}>
       <View
-        className={`mb-2 max-w-[85%] rounded-2xl px-3 py-2 ${
-          isMine ? 'self-end bg-brand' : 'self-start bg-white'
+        className={`mb-2 max-w-[82%] px-4 py-3 ${
+          isMine
+            ? 'self-end rounded-[20px] rounded-br-md bg-[#4F7CFF]'
+            : 'self-start rounded-[20px] rounded-bl-md bg-[#F3F4F6]'
         }`}
       >
         {!isMine && message.senderLabel ? (
@@ -21,17 +23,17 @@ export default function MessageBubble({
         ) : null}
 
         {message.type === 'text' ? (
-          <Text className={`${isMine ? 'text-white' : 'text-slate-900'}`}>{message.text}</Text>
+          <Text className={`${isMine ? 'text-white' : 'text-slate-900'} text-[15px]`}>{message.text}</Text>
         ) : null}
 
         {message.type !== 'text' && message.mediaUrl ? (
           message.type === 'image' ? (
-            <Image source={{ uri: message.mediaUrl }} className="h-48 w-56 rounded-xl" resizeMode="cover" />
+            <Image source={{ uri: message.mediaUrl }} className="h-52 w-56 rounded-2xl" resizeMode="cover" />
           ) : (
-            <View className="rounded-xl bg-slate-900/15 px-3 py-4">
-              <Text className={`${isMine ? 'text-white' : 'text-slate-900'}`}>Video uploaded</Text>
-              <Text className={`${isMine ? 'text-white/80' : 'text-slate-600'} text-xs`}>
-                Tap-to-play integration next.
+            <View className="rounded-2xl bg-slate-900/10 px-3 py-4">
+              <Text className={`${isMine ? 'text-white' : 'text-slate-900'} font-medium`}>Video message</Text>
+              <Text className={`${isMine ? 'text-white/85' : 'text-slate-600'} mt-0.5 text-xs`}>
+                Tap-to-play integration ready for hookup.
               </Text>
             </View>
           )

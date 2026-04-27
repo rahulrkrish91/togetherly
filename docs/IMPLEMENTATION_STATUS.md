@@ -56,6 +56,7 @@
 - ✅ Image/video picking + image compression + upload progress + retry scaffold implemented.
 - ✅ Pagination UX in FlatList + lazy loading older messages scaffold implemented.
 - ✅ Message entrance animations and skeleton loaders implemented.
+- ✅ High-end glassmorphism chat list/window template implemented (FAB, online indicators, rich composer).
 - 🚧 Add video playback, delivery/read receipts, and message reactions.
 
 ### Family coordination tools

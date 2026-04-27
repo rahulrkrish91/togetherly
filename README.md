@@ -16,6 +16,7 @@ React Native (Expo) + TypeScript starter for a multi-family collaboration app wi
 - Firebase client setup (Auth, Firestore, Storage service modules)
 - Core domain types and Firebase error parser
 - Chat core scaffold: realtime listener room, text composer, media upload with progress/retry, pagination + lazy-load
+- High-end chat UI template: minimalist glassmorphism list/window, online indicators, FAB, rich input bar, optimized FlatList
 - Family coordination tools scaffold: calendar month/agenda with event CRUD + live map sharing controls
 - Profile + permissions scaffold: profile edit (name/avatar), member management UI, admin-restricted actions
 - Security hardening scaffold: stricter Firestore field validation, Storage rules, validator parity helpers

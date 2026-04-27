@@ -5,7 +5,7 @@ import CallScreen from '../screens/chat/CallScreen';
 
 export type ChatStackParamList = {
   ChatList: undefined;
-  ChatRoom: { familyId: string };
+  ChatRoom: { familyId: string; title?: string; lastSeen?: string };
   Call: { familyId: string };
 };
 
@@ -15,7 +15,7 @@ export default function ChatStackNavigator() {
   return (
     <Stack.Navigator>
       <Stack.Screen name="ChatList" component={ChatListScreen} options={{ headerShown: false }} />
-      <Stack.Screen name="ChatRoom" component={ChatRoomScreen} options={{ title: 'Chat Room' }} />
+      <Stack.Screen name="ChatRoom" component={ChatRoomScreen} options={{ headerShown: false }} />
       <Stack.Screen name="Call" component={CallScreen} options={{ title: 'Family Call' }} />
     </Stack.Navigator>
   );
