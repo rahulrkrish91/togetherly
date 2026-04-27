@@ -5,40 +5,52 @@ service cloud.firestore {
       return request.auth != null;
     }
 
-    function familyMemberDocId(familyId) {
-      return request.auth.uid + '_' + familyId;
+    function familyMemberDocId(userId, familyId) {
+      return userId + '_' + familyId;
     }
 
     function isFamilyMember(familyId) {
-      return exists(/databases/$(database)/documents/familyMembers/$(familyMemberDocId(familyId)));
+      return isSignedIn() &&
+        exists(/databases/$(database)/documents/familyMembers/$(familyMemberDocId(request.auth.uid, familyId)));
     }
 
     match /families/{familyId} {
-      allow read: if isSignedIn() && isFamilyMember(familyId);
-      allow create: if isSignedIn();
-      allow update, delete: if isSignedIn() && isFamilyMember(familyId);
+      allow read: if isFamilyMember(familyId);
+      allow create: if isSignedIn() && request.resource.data.createdBy == request.auth.uid;
+      allow update, delete: if isFamilyMember(familyId);
+    }
+
+    match /familyMembers/{memberId} {
+      allow read: if isSignedIn() &&
+        (resource.data.userId == request.auth.uid || isFamilyMember(resource.data.familyId));
+
+      allow create: if isSignedIn() &&
+        request.resource.data.userId == request.auth.uid &&
+        request.resource.data.familyId is string;
+
+      allow update, delete: if false;
     }
 
     match /familyMetadata/{familyId} {
-      allow read: if isSignedIn() && isFamilyMember(familyId);
+      allow read: if isFamilyMember(familyId);
       allow write: if false;
     }
 
     match /messages/{messageId} {
-      allow read: if isSignedIn() && isFamilyMember(resource.data.familyId);
-      allow create: if isSignedIn() && isFamilyMember(request.resource.data.familyId);
+      allow read: if isFamilyMember(resource.data.familyId);
+      allow create: if isFamilyMember(request.resource.data.familyId);
       allow update, delete: if false;
     }
 
     match /events/{eventId} {
-      allow read: if isSignedIn() && isFamilyMember(resource.data.familyId);
-      allow create, update: if isSignedIn() && isFamilyMember(request.resource.data.familyId);
+      allow read: if isFamilyMember(resource.data.familyId);
+      allow create, update: if isFamilyMember(request.resource.data.familyId);
       allow delete: if false;
     }
 
     match /locations/{locationId} {
-      allow read: if isSignedIn() && isFamilyMember(resource.data.familyId);
-      allow create, update: if isSignedIn() && isFamilyMember(request.resource.data.familyId);
+      allow read: if isFamilyMember(resource.data.familyId);
+      allow create, update: if isFamilyMember(request.resource.data.familyId);
       allow delete: if false;
     }
   }

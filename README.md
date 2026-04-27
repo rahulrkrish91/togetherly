@@ -11,6 +11,7 @@ React Native (Expo) + TypeScript starter for a multi-family collaboration app wi
 - Navigation foundation:
   - Auth stack
   - Main bottom tabs (Families, Chat, Calendar, Map, Profile)
+- Family lifecycle scaffold: create/join/switch active family with Firestore + local persistence
 - NativeWind/Tailwind setup (`tailwind.config.js`, Babel plugin)
 - Firebase client setup (Auth, Firestore, Storage service modules)
 - Core domain types and Firebase error parser
@@ -93,9 +94,9 @@ firebase-blueprint.json
 
 ## Next implementation targets
 
-1. Production-hardening for Google and phone auth error handling edge cases.
-2. Family create/join/switch backed by Firestore collections.
+1. Production-hardening for Google and phone auth + family invite edge-case handling.
+2. Add family role management UI (promote/demote/remove members).
 3. Chat room screen with paginated messages and Storage uploads.
 4. Calendar + event CRUD with role-aware permissions.
 5. Live location map updates scoped by active family.
-6. Tighten Firestore rules to match final document IDs and write validations.
+6. Tighten Firestore rules with field-level validations and indexes.

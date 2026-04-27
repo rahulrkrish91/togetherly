@@ -44,10 +44,11 @@
 - Add auth analytics and structured error telemetry.
 
 ### Family lifecycle and multi-family logic
-- Build create family flow with generated invite code/link.
-- Build join family flow with validation and expiry checks.
-- Implement active family switcher and persist selected family locally.
-- Enforce role-based actions (Admin vs Member) across writes.
+- ✅ Create family flow scaffold implemented (Firestore write + admin membership bootstrap).
+- ✅ Join family by invite code scaffold implemented.
+- ✅ Active family switcher implemented and persisted locally.
+- 🚧 Enforce advanced role-based actions (Admin vs Member) across writes.
+- 🚧 Add invite expiry checks and one-time invite behavior.
 
 ### Chat system (core)
 - Implement real-time listener-based chat room UI.

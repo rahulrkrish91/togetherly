@@ -8,6 +8,13 @@ export interface User {
   photoURL: string | null;
 }
 
+export interface Family {
+  id: string;
+  name: string;
+  createdBy: string;
+  inviteCode: string;
+}
+
 export interface FamilyMember {
   id: string;
   familyId: string;
