@@ -72,16 +72,17 @@
 - 🚧 Add moderation/audit history and stronger admin guardrails.
 
 ### Security and backend hardening
-- Tighten Firestore rules with stricter per-collection field validation.
-- Add explicit helper parity between app logic and rules (`isValidUser`, `isValidFamilyMember`).
-- Add Storage rules for media ownership/family access constraints.
-- Add Firestore indexes required by paginated + filtered queries.
+- ✅ Firestore rules tightened with stricter per-collection field validation.
+- ✅ Added explicit helper parity in app code and rules (`isValidUser`, `isValidFamilyMember`).
+- ✅ Added Storage rules for media ownership/family access constraints.
+- ✅ Added Firestore indexes for paginated + filtered queries.
 
 ### Quality and operations
-- Install dependencies in a permitted environment and restore CI checks.
-- Add unit tests for query/write helpers and error parser.
-- Add integration tests for auth, family join, and chat send/retry flows.
-- Add crash/error telemetry and structured analytics events.
+- ✅ Added CI workflow checks (`typecheck`, `lint`, unit + integration tests).
+- ✅ Added unit tests for query/write helpers and error parser.
+- ✅ Added integration workflow test scaffolds for auth/family/chat flow.
+- ✅ Added crash/error telemetry + structured event tracking utility.
+- 🚧 Install dependencies and execute full CI in a permitted networked environment.
 
 ### Phase 2 backlog
 - Push notifications (FCM) for chat/events.

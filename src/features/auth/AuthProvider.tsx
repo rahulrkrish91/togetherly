@@ -24,6 +24,7 @@ import {
 import { FirebaseRecaptchaVerifierModal } from 'expo-firebase-recaptcha';
 import { FirebaseApp } from 'firebase/app';
 import { auth } from '../../services/firebase/auth';
+import { trackError, trackEvent } from '../../services/telemetry/telemetry';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -73,7 +74,10 @@ export function AuthProvider({ children, firebaseApp }: { children: ReactNode; f
     if (!idToken) return;
 
     const credential = GoogleAuthProvider.credential(idToken);
-    signInWithCredential(auth, credential).catch(() => {
+    signInWithCredential(auth, credential).then(() => {
+      trackEvent('auth_google_success');
+    }).catch((error) => {
+      trackError('auth_google_credential_failed', error);
       setGoogleLoading(false);
     });
   }, [googleResponse]);
@@ -85,6 +89,7 @@ export function AuthProvider({ children, firebaseApp }: { children: ReactNode; f
     const result = await googlePromptAsync();
 
     if (result.type !== 'success') {
+      trackEvent('auth_google_cancelled', { type: result.type });
       setGoogleLoading(false);
       return;
     }
@@ -102,7 +107,11 @@ export function AuthProvider({ children, firebaseApp }: { children: ReactNode; f
         phoneNumber,
         recaptchaRef.current
       );
+      trackEvent('auth_phone_otp_sent');
       return confirmation.verificationId;
+    } catch (error) {
+      trackError('auth_phone_otp_send_failed', error);
+      throw error;
     } finally {
       setPhoneLoading(false);
     }
@@ -113,6 +122,10 @@ export function AuthProvider({ children, firebaseApp }: { children: ReactNode; f
     try {
       const credential = PhoneAuthProvider.credential(verificationId, otp);
       await signInWithCredential(auth, credential);
+      trackEvent('auth_phone_success');
+    } catch (error) {
+      trackError('auth_phone_verify_failed', error);
+      throw error;
     } finally {
       setPhoneLoading(false);
     }

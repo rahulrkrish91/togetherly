@@ -23,6 +23,7 @@ import {
   uploadMediaWithProgress,
 } from '../../../services/chat/chatService';
 import { useAuth } from '../../../features/auth/AuthProvider';
+import { trackError, trackEvent } from '../../../services/telemetry/telemetry';
 
 type UploadDraft = {
   id: string;
@@ -71,6 +72,9 @@ export default function ChatRoomScreen({ route }: { route: { params: { familyId:
         text: input.trim(),
       });
       setInput('');
+      trackEvent('chat_text_sent', { familyId });
+    } catch (error) {
+      trackError('chat_pagination_load_failed', error, { familyId });
     } finally {
       setSending(false);
     }
@@ -85,6 +89,8 @@ export default function ChatRoomScreen({ route }: { route: { params: { familyId:
         setMessages((prev) => [...prev, ...result.items]);
         setLastCursor(result.nextCursor);
       }
+    } catch (error) {
+      trackError('chat_pagination_load_failed', error, { familyId });
     } finally {
       setLoadingMore(false);
     }
@@ -110,7 +116,10 @@ export default function ChatRoomScreen({ route }: { route: { params: { familyId:
       uri,
       path,
       (progress) => upsertDraft(draftId, { progress }),
-      () => upsertDraft(draftId, { failed: true }),
+      (error) => {
+        upsertDraft(draftId, { failed: true });
+        trackError('chat_media_upload_failed', error, { familyId, type });
+      },
       async (downloadUrl) => {
         try {
           await sendMediaMessage({
@@ -121,8 +130,10 @@ export default function ChatRoomScreen({ route }: { route: { params: { familyId:
             mediaUrl: downloadUrl,
           });
           finalizeDraft(draftId);
+          trackEvent('chat_media_sent', { familyId, type });
         } catch {
           upsertDraft(draftId, { failed: true });
+          trackError('chat_media_send_failed', new Error('Failed to create media message'), { familyId, type });
         }
       }
     );

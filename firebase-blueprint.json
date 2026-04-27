@@ -77,8 +77,8 @@
     }
   },
   "constraints": {
-    "isValidUser": "auth.uid exists in users",
-    "isValidFamilyMember": "auth.uid has familyMembers record for familyId",
+    "isValidUser": "users/{uid} exists and record passes validator parity",
+    "isValidFamilyMember": "familyMembers/{uid_familyId} exists and role in admin|member",
     "adminOnlyWrites": [
       "families.updateSensitiveFields",
       "familyMembers.roleChanges",
@@ -96,5 +96,10 @@
       "description": "desc",
       "imageUrl": "url"
     }
+  },
+  "security": {
+    "storageRules": "firebase/storage.rules",
+    "firestoreRules": "firebase/firestore.rules",
+    "indexes": "firebase/firestore.indexes.json"
   }
 }
