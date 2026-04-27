@@ -5,6 +5,9 @@ React Native (Expo) + TypeScript starter for a multi-family collaboration app wi
 ## Implemented in this starter
 
 - Expo + TypeScript app bootstrap (`App.tsx`)
+- Auth state provider (`AuthProvider`) with Firebase session listener
+- Google Sign-In flow scaffold via `expo-auth-session` + Firebase credential exchange
+- Phone auth flow scaffold via Firebase OTP + Expo reCAPTCHA modal
 - Navigation foundation:
   - Auth stack
   - Main bottom tabs (Families, Chat, Calendar, Map, Profile)
@@ -35,6 +38,11 @@ EXPO_PUBLIC_FIREBASE_PROJECT_ID=
 EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=
 EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
 EXPO_PUBLIC_FIREBASE_APP_ID=
+
+EXPO_PUBLIC_GOOGLE_EXPO_CLIENT_ID=
+EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID=
+EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID=
+EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID=
 ```
 
 ## Project structure
@@ -47,7 +55,9 @@ src/
     screens/
   components/
   features/
+    auth/
   services/
+    firebase/
     firestore/
   types/
   utils/
@@ -55,6 +65,12 @@ firebase/
   firestore.rules
 firebase-blueprint.json
 ```
+
+## Auth flows in this baseline
+
+- **Google login:** `useAuthRequest` starts OAuth and exchanges `idToken` with Firebase Auth.
+- **Phone login:** send OTP with reCAPTCHA verifier and confirm with `verificationId + code`.
+- **Session persistence:** uses React Native persistence with AsyncStorage in Firebase Auth initialization.
 
 ## Firestore bill reduction strategy (implemented + next)
 
@@ -77,7 +93,7 @@ firebase-blueprint.json
 
 ## Next implementation targets
 
-1. Real Google Sign-In flow with Firebase Auth session restore.
+1. Production-hardening for Google and phone auth error handling edge cases.
 2. Family create/join/switch backed by Firestore collections.
 3. Chat room screen with paginated messages and Storage uploads.
 4. Calendar + event CRUD with role-aware permissions.

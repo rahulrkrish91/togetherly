@@ -1,16 +1,11 @@
-import { useMemo } from 'react';
+import { useAuth } from './AuthProvider';
 
-export interface AuthSessionState {
-  isLoading: boolean;
-  isAuthenticated: boolean;
-}
+export function useAuthSession() {
+  const { isLoading, isAuthenticated, authUser } = useAuth();
 
-export function useAuthSession(): AuthSessionState {
-  return useMemo(
-    () => ({
-      isLoading: false,
-      isAuthenticated: false,
-    }),
-    []
-  );
+  return {
+    isLoading,
+    isAuthenticated,
+    authUser,
+  };
 }

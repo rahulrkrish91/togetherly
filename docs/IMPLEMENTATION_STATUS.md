@@ -21,6 +21,8 @@
 ### Firebase integration baseline
 - Firebase app initialization module added.
 - Auth, Firestore, and Storage service modules added.
+- Google login scaffold added (Expo Auth Session + Firebase credential sign-in).
+- Phone authentication scaffold added (OTP + reCAPTCHA verifier modal).
 - Environment variable contract is documented.
 
 ### Firestore data/contracts/security baseline
@@ -37,9 +39,9 @@
 ## 🚧 What still needs to be done
 
 ### Authentication
-- Implement real Google Sign-In for Expo and Firebase Auth token exchange.
-- Handle cancel/login errors, refresh tokens, and session restore reliably.
+- Harden Google Sign-In and phone auth edge-case handling (cancellation, throttling, OTP expiry).
 - Add user bootstrap document creation/update after first login.
+- Add auth analytics and structured error telemetry.
 
 ### Family lifecycle and multi-family logic
 - Build create family flow with generated invite code/link.
