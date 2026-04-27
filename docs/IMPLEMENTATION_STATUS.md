@@ -59,10 +59,11 @@
 - 🚧 Add video playback, delivery/read receipts, and message reactions.
 
 ### Family coordination tools
-- Integrate `react-native-calendars` for monthly/agenda event views.
-- Implement event CRUD with family scoping and categories.
-- Integrate `expo-location` + `react-native-maps` for live member map.
-- Add opt-in location sharing controls and update intervals.
+- ✅ Integrated `react-native-calendars` monthly calendar view with agenda list.
+- ✅ Event CRUD scaffold implemented with family scoping and category tags.
+- ✅ Integrated `expo-location` + `react-native-maps` live member map scaffold.
+- ✅ Added opt-in location sharing controls and configurable update intervals.
+- 🚧 Add reminders, richer event editing, and background-safe location policy.
 
 ### Profiles and permissions
 - Complete profile edit flow (name/avatar).
