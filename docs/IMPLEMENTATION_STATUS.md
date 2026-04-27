@@ -51,11 +51,12 @@
 - 🚧 Add invite expiry checks and one-time invite behavior.
 
 ### Chat system (core)
-- Implement real-time listener-based chat room UI.
-- Add text message composer + send pipeline.
-- Add image/video picking, compression, upload progress, retry UI.
-- Add pagination UX in FlatList + lazy loading older messages.
-- Add message animations and loading/skeleton states.
+- ✅ Real-time listener-based chat room scaffold implemented.
+- ✅ Text message composer + send pipeline implemented.
+- ✅ Image/video picking + image compression + upload progress + retry scaffold implemented.
+- ✅ Pagination UX in FlatList + lazy loading older messages scaffold implemented.
+- ✅ Message entrance animations and skeleton loaders implemented.
+- 🚧 Add video playback, delivery/read receipts, and message reactions.
 
 ### Family coordination tools
 - Integrate `react-native-calendars` for monthly/agenda event views.
