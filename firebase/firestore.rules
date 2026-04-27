@@ -5,30 +5,49 @@ service cloud.firestore {
       return request.auth != null;
     }
 
-    function familyMemberDocId(userId, familyId) {
+    function memberDocId(userId, familyId) {
       return userId + '_' + familyId;
     }
 
+    function myMembership(familyId) {
+      return get(/databases/$(database)/documents/familyMembers/$(memberDocId(request.auth.uid, familyId)));
+    }
+
     function isFamilyMember(familyId) {
-      return isSignedIn() &&
-        exists(/databases/$(database)/documents/familyMembers/$(familyMemberDocId(request.auth.uid, familyId)));
+      return isSignedIn() && myMembership(familyId).exists();
+    }
+
+    function isFamilyAdmin(familyId) {
+      return isFamilyMember(familyId) && myMembership(familyId).data.role == 'admin';
+    }
+
+    match /users/{userId} {
+      allow read: if isSignedIn() && request.auth.uid == userId;
+      allow create, update: if isSignedIn() && request.auth.uid == userId;
+      allow delete: if false;
     }
 
     match /families/{familyId} {
       allow read: if isFamilyMember(familyId);
       allow create: if isSignedIn() && request.resource.data.createdBy == request.auth.uid;
-      allow update, delete: if isFamilyMember(familyId);
+      allow update, delete: if isFamilyAdmin(familyId);
     }
 
     match /familyMembers/{memberId} {
       allow read: if isSignedIn() &&
         (resource.data.userId == request.auth.uid || isFamilyMember(resource.data.familyId));
 
+      // Self-join is allowed (invite flow). Admin can also add members manually.
       allow create: if isSignedIn() &&
-        request.resource.data.userId == request.auth.uid &&
+        ((request.resource.data.userId == request.auth.uid) || isFamilyAdmin(request.resource.data.familyId)) &&
         request.resource.data.familyId is string;
 
-      allow update, delete: if false;
+      // Admin-only role/profile updates.
+      allow update: if isSignedIn() && isFamilyAdmin(resource.data.familyId);
+
+      // Admin can remove members; users can remove themselves (leave family).
+      allow delete: if isSignedIn() &&
+        (isFamilyAdmin(resource.data.familyId) || resource.data.userId == request.auth.uid);
     }
 
     match /familyMetadata/{familyId} {
@@ -45,7 +64,7 @@ service cloud.firestore {
     match /events/{eventId} {
       allow read: if isFamilyMember(resource.data.familyId);
       allow create, update: if isFamilyMember(request.resource.data.familyId);
-      allow delete: if false;
+      allow delete: if isFamilyAdmin(resource.data.familyId);
     }
 
     match /locations/{locationId} {

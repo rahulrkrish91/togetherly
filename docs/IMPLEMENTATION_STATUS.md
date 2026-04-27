@@ -66,9 +66,10 @@
 - 🚧 Add reminders, richer event editing, and background-safe location policy.
 
 ### Profiles and permissions
-- Complete profile edit flow (name/avatar).
-- Implement family member management UI.
-- Restrict privileged operations to admins in both UI and Firestore rules.
+- ✅ Profile edit flow scaffold implemented (display name + avatar upload).
+- ✅ Family member management UI scaffold implemented.
+- ✅ Privileged operations restricted to admins in both UI controls and Firestore rules.
+- 🚧 Add moderation/audit history and stronger admin guardrails.
 
 ### Security and backend hardening
 - Tighten Firestore rules with stricter per-collection field validation.

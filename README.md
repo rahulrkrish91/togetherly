@@ -17,6 +17,7 @@ React Native (Expo) + TypeScript starter for a multi-family collaboration app wi
 - Core domain types and Firebase error parser
 - Chat core scaffold: realtime listener room, text composer, media upload with progress/retry, pagination + lazy-load
 - Family coordination tools scaffold: calendar month/agenda with event CRUD + live map sharing controls
+- Profile + permissions scaffold: profile edit (name/avatar), member management UI, admin-restricted actions
 - Initial screen stubs for feature verticals
 - Initial Firestore rules draft with membership helper checks
 - Firestore cost-control helpers for cache-first reads, pagination, delta sync, and no-op write prevention
@@ -97,7 +98,7 @@ firebase-blueprint.json
 ## Next implementation targets
 
 1. Production-hardening for Google and phone auth + family invite edge-case handling.
-2. Add family role management UI (promote/demote/remove members).
+2. Harden member management workflows (confirm dialogs, audit logs, bulk invites).
 3. Harden chat room media pipeline (thumbnail previews, video playback, delivery receipts).
 4. Add advanced event editing (time ranges, reminders, attendee mentions).
 5. Add background location mode + battery-aware throttling policies.
