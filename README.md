@@ -100,6 +100,30 @@ android/app/build/outputs/apk/debug/app-debug.apk
 
 For local APK builds you need a working Android SDK, JDK, and Gradle environment. If you only need an installable file to share with testers, prefer the EAS `preview` build.
 
+
+## Troubleshooting `expo start`
+
+### `Error: The required package \`expo-asset\` cannot be found`
+
+Expo Metro requires `expo-asset` at startup. This project declares it in `package.json`, but if you pulled changes before it was added or your `node_modules` folder is stale, reinstall dependencies:
+
+```bash
+rm -rf node_modules package-lock.json
+npm install
+```
+
+Or install only the missing Expo package with the Expo-compatible version:
+
+```bash
+npx expo install expo-asset
+```
+
+Then restart Metro with a clean cache:
+
+```bash
+npm run start -- --clear
+```
+
 ## Environment variables
 
 Create a `.env` file with:
