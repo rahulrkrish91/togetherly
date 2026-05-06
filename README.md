@@ -35,6 +35,71 @@ npm run start
 
 > If your environment blocks npm registry access, install from an approved mirror and then run the same commands.
 
+
+## Running the app
+
+### 1) Install dependencies
+
+```bash
+npm install
+```
+
+### 2) Configure environment variables
+
+Create `.env` from the variables listed below, then fill in your Firebase and Google OAuth values.
+
+### 3) Start Expo Metro
+
+```bash
+npm run start
+```
+
+From the Expo terminal UI, press:
+
+- `a` to open Android emulator/device
+- `i` to open iOS simulator on macOS
+- scan the QR code with Expo Go if all used native modules are supported by Expo Go
+
+### 4) Run directly on Android emulator or USB device
+
+```bash
+npm run android
+```
+
+This uses the existing package script, which runs `expo run:android`.
+
+## Creating an Android APK
+
+You have two practical APK paths:
+
+### Option A: Cloud/internal APK with EAS (recommended for sharing)
+
+```bash
+npm install -g eas-cli
+eas login
+eas build:configure
+eas build --platform android --profile preview
+```
+
+The `preview` EAS profile is configured to produce an Android APK for internal installation.
+
+### Option B: Local debug APK with Gradle
+
+```bash
+npm install
+npx expo prebuild --platform android
+cd android
+./gradlew assembleDebug
+```
+
+The generated debug APK will be at:
+
+```text
+android/app/build/outputs/apk/debug/app-debug.apk
+```
+
+For local APK builds you need a working Android SDK, JDK, and Gradle environment. If you only need an installable file to share with testers, prefer the EAS `preview` build.
+
 ## Environment variables
 
 Create a `.env` file with:
