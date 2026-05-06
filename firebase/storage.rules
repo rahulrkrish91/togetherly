@@ -1,0 +1,29 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function memberDocId(userId, familyId) {
+      return userId + '_' + familyId;
+    }
+
+    function isFamilyMember(familyId) {
+      return isSignedIn() &&
+        firestore.get(
+          /databases/(default)/documents/familyMembers/$(memberDocId(request.auth.uid, familyId))
+        ).exists();
+    }
+
+    match /avatars/{userId}/{allPaths=**} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn() && request.auth.uid == userId;
+    }
+
+    match /chat/{familyId}/{userId}/{allPaths=**} {
+      allow read: if isFamilyMember(familyId);
+      allow write: if isFamilyMember(familyId) && request.auth.uid == userId;
+    }
+  }
+}

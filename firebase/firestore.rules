@@ -1,0 +1,107 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function memberDocId(userId, familyId) {
+      return userId + '_' + familyId;
+    }
+
+    function userDoc(userId) {
+      return get(/databases/$(database)/documents/users/$(userId));
+    }
+
+    function isValidUser(userId) {
+      return isSignedIn() && userDoc(userId).exists();
+    }
+
+    function myMembership(familyId) {
+      return get(/databases/$(database)/documents/familyMembers/$(memberDocId(request.auth.uid, familyId)));
+    }
+
+    function isValidFamilyMember(userId, familyId) {
+      return exists(/databases/$(database)/documents/familyMembers/$(memberDocId(userId, familyId)));
+    }
+
+    function isFamilyMember(familyId) {
+      return isSignedIn() && isValidFamilyMember(request.auth.uid, familyId);
+    }
+
+    function isFamilyAdmin(familyId) {
+      return isFamilyMember(familyId) && myMembership(familyId).data.role == 'admin';
+    }
+
+    function hasOnlyKeys(data, keys) {
+      return data.keys().hasOnly(keys);
+    }
+
+    match /users/{userId} {
+      allow read: if isSignedIn() && request.auth.uid == userId;
+      allow create: if isSignedIn() && request.auth.uid == userId &&
+        hasOnlyKeys(request.resource.data, ['displayName', 'photoURL', 'email', 'updatedAt', 'createdAt']);
+      allow update: if isSignedIn() && request.auth.uid == userId &&
+        hasOnlyKeys(request.resource.data, ['displayName', 'photoURL', 'email', 'updatedAt', 'createdAt']);
+      allow delete: if false;
+    }
+
+    match /families/{familyId} {
+      allow read: if isFamilyMember(familyId);
+      allow create: if isSignedIn() && request.resource.data.createdBy == request.auth.uid &&
+        hasOnlyKeys(request.resource.data, ['name', 'createdBy', 'inviteCode', 'createdAt', 'updatedAt']) &&
+        request.resource.data.name is string && request.resource.data.inviteCode is string;
+      allow update: if isFamilyAdmin(familyId) &&
+        hasOnlyKeys(request.resource.data, ['name', 'createdBy', 'inviteCode', 'createdAt', 'updatedAt']);
+      allow delete: if isFamilyAdmin(familyId);
+    }
+
+    match /familyMembers/{memberId} {
+      allow read: if isSignedIn() &&
+        (resource.data.userId == request.auth.uid || isFamilyMember(resource.data.familyId));
+
+      allow create: if isSignedIn() &&
+        ((request.resource.data.userId == request.auth.uid) || isFamilyAdmin(request.resource.data.familyId)) &&
+        hasOnlyKeys(request.resource.data, ['familyId', 'userId', 'role', 'joinedAt', 'displayName', 'avatarUrl']) &&
+        request.resource.data.familyId is string && request.resource.data.userId is string;
+
+      allow update: if isSignedIn() && isFamilyAdmin(resource.data.familyId) &&
+        hasOnlyKeys(request.resource.data, ['familyId', 'userId', 'role', 'joinedAt', 'displayName', 'avatarUrl', 'updatedAt']);
+
+      allow delete: if isSignedIn() &&
+        (isFamilyAdmin(resource.data.familyId) || resource.data.userId == request.auth.uid);
+    }
+
+    match /messages/{messageId} {
+      allow read: if isFamilyMember(resource.data.familyId);
+      allow create: if isFamilyMember(request.resource.data.familyId) &&
+        hasOnlyKeys(request.resource.data, ['familyId', 'senderId', 'senderLabel', 'type', 'text', 'mediaUrl', 'uploadStatus', 'createdAt']) &&
+        request.resource.data.senderId == request.auth.uid &&
+        request.resource.data.type in ['text', 'image', 'video', 'audio'];
+      allow update, delete: if false;
+    }
+
+    match /events/{eventId} {
+      allow read: if isFamilyMember(resource.data.familyId);
+      allow create: if isFamilyMember(request.resource.data.familyId) &&
+        hasOnlyKeys(request.resource.data, ['familyId', 'title', 'description', 'category', 'startAt', 'endAt', 'createdBy', 'createdAt', 'updatedAt']) &&
+        request.resource.data.category in ['birthday', 'meeting', 'trip', 'custom'];
+      allow update: if isFamilyMember(resource.data.familyId) &&
+        hasOnlyKeys(request.resource.data, ['familyId', 'title', 'description', 'category', 'startAt', 'endAt', 'createdBy', 'createdAt', 'updatedAt']);
+      allow delete: if isFamilyAdmin(resource.data.familyId);
+    }
+
+    match /locations/{locationId} {
+      allow read: if isFamilyMember(resource.data.familyId);
+      allow create, update: if isFamilyMember(request.resource.data.familyId) &&
+        hasOnlyKeys(request.resource.data, ['familyId', 'userId', 'userLabel', 'lat', 'lng', 'accuracy', 'updatedAt']) &&
+        request.resource.data.userId == request.auth.uid;
+      allow delete: if false;
+    }
+
+    match /familyMetadata/{familyId} {
+      allow read: if isFamilyMember(familyId);
+      allow write: if false;
+    }
+  }
+}
