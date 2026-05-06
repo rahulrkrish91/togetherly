@@ -1,0 +1,105 @@
+{
+  "meta": {
+    "app": "family-connection-hub",
+    "version": "1.0.0",
+    "strictTyping": true
+  },
+  "collections": {
+    "users": {
+      "id": "string",
+      "displayName": "string",
+      "email": "string",
+      "photoURL": "string|null",
+      "createdAt": "timestamp",
+      "updatedAt": "timestamp"
+    },
+    "families": {
+      "id": "string",
+      "name": "string",
+      "createdBy": "userId",
+      "inviteCode": "string",
+      "createdAt": "timestamp",
+      "updatedAt": "timestamp"
+    },
+    "familyMembers": {
+      "id": "string",
+      "familyId": "familyId",
+      "userId": "userId",
+      "role": "admin|member",
+      "joinedAt": "timestamp"
+    },
+    "messages": {
+      "id": "string",
+      "familyId": "familyId",
+      "senderId": "userId",
+      "type": "text|image|video|audio",
+      "text": "string|null",
+      "mediaUrl": "string|null",
+      "thumbnailUrl": "string|null",
+      "uploadStatus": "pending|uploaded|failed",
+      "createdAt": "timestamp"
+    },
+    "events": {
+      "id": "string",
+      "familyId": "familyId",
+      "title": "string",
+      "description": "string|null",
+      "category": "birthday|meeting|trip|custom",
+      "startAt": "timestamp",
+      "endAt": "timestamp|null",
+      "createdBy": "userId",
+      "createdAt": "timestamp"
+    },
+    "locations": {
+      "id": "string",
+      "familyId": "familyId",
+      "userId": "userId",
+      "lat": "number",
+      "lng": "number",
+      "accuracy": "number|null",
+      "updatedAt": "timestamp"
+    },
+    "invites": {
+      "id": "string",
+      "familyId": "familyId",
+      "code": "string",
+      "createdBy": "userId",
+      "expiresAt": "timestamp",
+      "usedBy": "userId|null",
+      "usedAt": "timestamp|null"
+    },
+    "familyMetadata": {
+      "id": "familyId",
+      "msgCount": "number",
+      "memberCount": "number",
+      "eventCount": "number",
+      "updatedAt": "timestamp"
+    }
+  },
+  "constraints": {
+    "isValidUser": "users/{uid} exists and record passes validator parity",
+    "isValidFamilyMember": "familyMembers/{uid_familyId} exists and role in admin|member",
+    "adminOnlyWrites": [
+      "families.updateSensitiveFields",
+      "familyMembers.roleChanges",
+      "invites.create"
+    ]
+  },
+  "costOptimization": {
+    "deltaSyncField": "createdAt",
+    "defaultPageSize": 25,
+    "cacheFirstReads": true,
+    "metadataDocs": [
+      "familyMetadata/{familyId}"
+    ],
+    "compactFieldExamples": {
+      "description": "desc",
+      "imageUrl": "url"
+    }
+  },
+  "security": {
+    "storageRules": "firebase/storage.rules",
+    "firestoreRules": "firebase/firestore.rules",
+    "indexes": "firebase/firestore.indexes.json"
+  }
+}
